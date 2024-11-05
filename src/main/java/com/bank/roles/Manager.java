@@ -1,12 +1,13 @@
+
 package com.bank.roles;
 
+import com.bank.auth.*;
 
 public class Manager extends User {
 
-    public Manager(String id, String username, String password) {
-        super(id, username, password, new Role("Manager", "Responsible for managing employees and operations."));
+    public Manager(String id, String username, String password, Role role) {
+        super(id, username, password, role);
     }
 
     // Manager-specific methods
 }
-
