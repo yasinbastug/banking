@@ -1,6 +1,7 @@
 package com.bank.services;
 
 import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -18,9 +19,9 @@ public class AccountService {
     public void closeAccount(String accountNumber) {
         Account account = Account.loadAccount(accountNumber);
         if (account != null && account.getBalance() == 0) {
-            List<String> lines = FileUtils.readAllLines(Account.FILE_PATH);
+            List<String> lines = FileUtils.readAllLines(Account.getFilePath());
             lines.removeIf(line -> line.startsWith(accountNumber));
-            try (BufferedWriter writer = new BufferedWriter(new FileWriter(Account.FILE_PATH))) {
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(Account.getFilePath()))) {
                 for (String line : lines) {
                     writer.write(line);
                     writer.newLine();
