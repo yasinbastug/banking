@@ -46,12 +46,12 @@ public abstract class Account {
     // Save account to file
     public void saveToFile() {
         String line = accountNumber + "," + type + "," + userId + "," + balance;
-        FileUtils.writeLine(FILE_PATH, line, true);
+        FileUtils.writeLine(getFilePath(), line, true);
     }
 
     // Update account balance in file
     private void updateAccountInFile() {
-        List<String> lines = FileUtils.readAllLines(FILE_PATH);
+        List<String> lines = FileUtils.readAllLines(getFilePath());
         for (int i = 0; i < lines.size(); i++) {
             String[] parts = lines.get(i).split(",");
             if (parts[0].equals(accountNumber)) {
@@ -59,7 +59,7 @@ public abstract class Account {
                 break;
             }
         }
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_PATH))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(getFilePath()))) {
             for (String line : lines) {
                 writer.write(line);
                 writer.newLine();
@@ -71,7 +71,7 @@ public abstract class Account {
 
     // Load account by accountNumber
     public static Account loadAccount(String accountNumber) {
-        List<String> lines = FileUtils.readAllLines(FILE_PATH);
+        List<String> lines = FileUtils.readAllLines(getFilePath());
         for (String line : lines) {
             String[] parts = line.split(",");
             if (parts[0].equals(accountNumber)) {
@@ -87,4 +87,8 @@ public abstract class Account {
         }
         return null;
     }
+
+	public static String getFilePath() {
+		return FILE_PATH;
+	}
 }
