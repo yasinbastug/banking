@@ -1,20 +1,34 @@
 package com.bank.models;
 
-public class AccountTransfer extends Transaction {
-    private String receiverAccount;
+import com.bank.utils.FileUtils;
 
-    public AccountTransfer(String id, double amount, String accountNumber, String receiverAccount) {
-        super(id, amount, accountNumber);
-        this.receiverAccount = receiverAccount;
+public class AccountTransfer extends Transaction {
+    private String receiverAccountId;
+
+    public AccountTransfer(String transactionId, String accountId, double amount, String receiverAccountId) {
+        super(transactionId, accountId, amount);
+        this.receiverAccountId = receiverAccountId;
     }
 
     @Override
-    public void process() {
-        Account sender = Account.loadAccount(getAccountNumber());
-        Account receiver = Account.loadAccount(receiverAccount);
-        if (sender != null && receiver != null && sender.withdraw(getAmount())) {
-            receiver.deposit(getAmount());
-            saveToFile();
+    public void execute() {
+        Account sender = FileUtils.loadAccount(accountId);
+        Account receiver = FileUtils.loadAccount(receiverAccountId);
+        if (sender != null && receiver != null) {
+            if (sender.withdraw(amount)) {
+                receiver.deposit(amount);
+                sender.save();
+                receiver.save();
+                String details = "From: " + accountId + " To: " + receiverAccountId;
+                FileUtils.logTransaction("Transfer", details, amount);
+                System.out.println("Transfer successful. New balances:");
+                System.out.println("Sender (" + accountId + "): " + sender.getBalance());
+                System.out.println("Receiver (" + receiverAccountId + "): " + receiver.getBalance());
+            } else {
+                System.out.println("Insufficient funds for transfer.");
+            }
+        } else {
+            System.out.println("One or both accounts not found.");
         }
     }
 }

@@ -1,23 +1,14 @@
 package com.bank.auth;
 
 public class User {
-    // TODO: Implement User functionality
-
-public abstract class User {
-    private String id;
     private String username;
     private String password;
-    private Role role;
+    private String role;
 
-    public User(String id, String username, String password, Role role) {
-        this.id = id;
+    public User(String username, String password, String role) {
         this.username = username;
         this.password = password;
         this.role = role;
-    }
-
-    public String getId() {
-        return id;
     }
 
     public String getUsername() {
@@ -28,11 +19,7 @@ public abstract class User {
         return password;
     }
 
-    public Role getRole() {
+    public String getRole() {
         return role;
     }
-
-    // Additional methods can be defined here
-}
-
 }

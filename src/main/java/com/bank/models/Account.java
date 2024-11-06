@@ -1,96 +1,88 @@
 package com.bank.models;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.List;
-
 import com.bank.utils.FileUtils;
 
-public abstract class Account {
-    private String accountNumber;
-    private String type;
+import java.util.List;
+
+public class Account {
+    private String accountId;
     private String userId;
     private double balance;
+    private String type; // Type of account, e.g., "Savings" or "Checking"
 
-    private static final String FILE_PATH = "src/main/resources/data/accounts.txt";
-
-    public Account(String accountNumber, String type, String userId, double initialBalance) {
-        this.accountNumber = accountNumber;
-        this.type = type;
+    public Account(String accountId, String userId, double balance, String type) {
+        this.accountId = accountId;
         this.userId = userId;
-        this.balance = initialBalance;
+        this.balance = balance;
+        this.type = type;
     }
 
-    public String getAccountNumber() { return accountNumber; }
-    public String getType() { return type; }
-    public String getUserId() { return userId; }
-    public double getBalance() { return balance; }
+    // Getters
+    public String getAccountId() {
+        return accountId;
+    }
 
+    public String getUserId() {
+        return userId;
+    }
+
+    public double getBalance() {
+        return balance;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    // Deposit method to add funds to the account
     public void deposit(double amount) {
         if (amount > 0) {
             balance += amount;
-            updateAccountInFile();
+        } else {
+            System.out.println("Deposit amount must be positive.");
         }
     }
 
+    // Withdraw method to remove funds from the account
     public boolean withdraw(double amount) {
-        if (amount > 0 && amount <= balance) {
+        if (amount > 0 && balance >= amount) {
             balance -= amount;
-            updateAccountInFile();
             return true;
+        } else {
+            System.out.println("Insufficient funds or invalid withdrawal amount.");
+            return false;
         }
-        return false;
     }
 
-    // Save account to file
-    public void saveToFile() {
-        String line = accountNumber + "," + type + "," + userId + "," + balance;
-        FileUtils.writeLine(getFilePath(), line, true);
-    }
+    // Save or update the account entry in the file
+    public void save() {
+        List<String> lines = FileUtils.readAllLines("src/main/resources/data/accounts.txt");
+        boolean accountFound = false;
 
-    // Update account balance in file
-    private void updateAccountInFile() {
-        List<String> lines = FileUtils.readAllLines(getFilePath());
         for (int i = 0; i < lines.size(); i++) {
             String[] parts = lines.get(i).split(",");
-            if (parts[0].equals(accountNumber)) {
-                lines.set(i, accountNumber + "," + type + "," + userId + "," + balance);
+            if (parts[0].equals(accountId)) {
+                // Update the existing line with the current account details
+                lines.set(i, accountId + "," + userId + "," + balance + "," + type);
+                accountFound = true;
                 break;
             }
         }
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(getFilePath()))) {
-            for (String line : lines) {
-                writer.write(line);
-                writer.newLine();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+
+        if (!accountFound) {
+            // If the account doesn't exist, add it as a new line
+            lines.add(accountId + "," + userId + "," + balance + "," + type);
         }
+
+        // Write all lines back to the file
+        FileUtils.writeLines("src/main/resources/data/accounts.txt", lines, false);
     }
 
-    // Load account by accountNumber
-    public static Account loadAccount(String accountNumber) {
-        List<String> lines = FileUtils.readAllLines(getFilePath());
-        for (String line : lines) {
-            String[] parts = line.split(",");
-            if (parts[0].equals(accountNumber)) {
-                String type = parts[1];
-                String userId = parts[2];
-                double balance = Double.parseDouble(parts[3]);
-                if (type.equals("Savings")) {
-                    return new SavingsAccount(accountNumber, userId, balance);
-                } else if (type.equals("Checking")) {
-                    return new CheckingAccount(accountNumber, userId, balance);
-                }
-            }
-        }
-        return null;
+    @Override
+    public String toString() {
+        return "Account ID: " + accountId + "\n" +
+               "User ID: " + userId + "\n" +
+               "Balance: " + balance + "\n" +
+               "Type: " + type;
     }
-
-	public static String getFilePath() {
-		return FILE_PATH;
-	}
 }
-
-// HELLO
