@@ -9,7 +9,6 @@ import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class DepositTest {
-    private FileUtils fileUtilsMock;
     private Deposit deposit;
 
     @BeforeEach
@@ -31,7 +30,7 @@ public class DepositTest {
     }
 
     @Test
-    void testAccountNotFound() {
+    void testDepositAccountNotFound() {
         when(fileUtilsMock.loadAccount("accountId")).thenReturn(null);
 
         deposit = new Deposit("transac1", "accountId", 100.0, fileUtilsMock);
